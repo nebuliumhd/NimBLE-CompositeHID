@@ -1,17 +1,24 @@
 {
     "$schema": "https://raw.githubusercontent.com/platformio/platformio-core/develop/platformio/assets/schema/library.json",
-    "name": "ESP32-BLE-CompositeHID",
-    "version": "0.3.1",
-    "description": "Bluetooth LE Gamepad + Mouse + Keyboard library for the ESP32",
+    "name": "NimBLE-CompositeHID",
+    "version": "0.3.2-fork",
+    "description": "Bluetooth LE Gamepad + Mouse + Keyboard library for the nRF52 and ESP32",
     "keywords": [
-        "Communication"
+        "Communication",
+        "BLE",
+        "HID"
     ],
-    "homepage": "https://github.com/Mystfit/ESP32-BLE-CompositeHID",
+    "homepage": "https://github.com/nebuliumhd/NimBLE-CompositeHID",
     "repository": {
         "type": "git",
-        "url": "https://github.com/Mystfit/ESP32-BLE-CompositeHID.git"
+        "url": "https://github.com/nebuliumhd/NimBLE-CompositeHID.git"
     },
     "authors": [
+        {
+            "name": "nebuliumhd",
+            "maintainer": true,
+            "url": "https://github.com/nebuliumhd"
+        },
         {
             "name": "Mystfit",
             "maintainer": true,
