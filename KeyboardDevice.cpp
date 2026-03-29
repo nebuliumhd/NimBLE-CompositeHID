@@ -3,10 +3,10 @@
 #include "BleCompositeHID.h"
 
 #if defined(CONFIG_ARDUHAL_ESP_LOG)
-#include "esp32-hal-log.h"
+// #include "esp32-hal-log.h"
 #define LOG_TAG "KeyboardDevice"
 #else
-#include "esp_log.h"
+// #include "esp_log.h"
 static const char *LOG_TAG = "KeyboardDevice";
 #endif
 
@@ -18,7 +18,7 @@ KeyboardCallbacks::KeyboardCallbacks(KeyboardDevice* device) :
 void KeyboardCallbacks::onWrite(NimBLECharacteristic* pCharacteristic, NimBLEConnInfo& connInfo)
 {
     KeyboardOutputReport ledReport = pCharacteristic->getValue<uint8_t>();
-    ESP_LOGD(LOG_TAG, "KeyboardDevice::onWrite - LED Report: %d", ledReport);
+    // ESP_LOGD(LOG_TAG, "KeyboardDevice::onWrite - LED Report: %d", ledReport);
     _device->onLED.fire(ledReport);
 }
 
@@ -81,7 +81,7 @@ const BaseCompositeDeviceConfiguration* KeyboardDevice::getDeviceConfig() const
 
 void KeyboardDevice::resetKeys()
 {
-    std::lock_guard<std::mutex> lock(_mutex);
+    // std::lock_guard<std::mutex> lock(_mutex);
     _inputReport.modifiers = 0x00;
     _inputReport.reserved = 0x00;
     memset(&_inputReport.keys, KEY_NONE, sizeof(_inputReport.keys));
@@ -92,7 +92,7 @@ void KeyboardDevice::resetKeys()
 void KeyboardDevice::modifierKeyPress(uint8_t modifier)
 {
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _inputReport.modifiers |= modifier;
     }
 
@@ -105,7 +105,7 @@ void KeyboardDevice::modifierKeyPress(uint8_t modifier)
 void KeyboardDevice::modifierKeyRelease(uint8_t modifier)
 {
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _inputReport.modifiers ^= modifier;
     }
 
@@ -118,7 +118,7 @@ void KeyboardDevice::modifierKeyRelease(uint8_t modifier)
 void KeyboardDevice::mediaKeyPress(uint32_t mediaKey)
 {
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _mediaKeyInputReport.keys |= mediaKey;
     }
 
@@ -131,7 +131,7 @@ void KeyboardDevice::mediaKeyPress(uint32_t mediaKey)
 void KeyboardDevice::mediaKeyRelease(uint32_t mediaKey)
 {
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _mediaKeyInputReport.keys ^= mediaKey;
     }
 
@@ -150,7 +150,7 @@ void KeyboardDevice::keyPress(uint8_t keyCode)
         if (_inputReport.keys[slotIdx] == 0x00)
         {
             full = false;
-            std::lock_guard<std::mutex> lock(_mutex);
+            // std::lock_guard<std::mutex> lock(_mutex);
             _inputReport.keys[slotIdx] = keyCode;
             break;
         }
@@ -158,7 +158,7 @@ void KeyboardDevice::keyPress(uint8_t keyCode)
 
     // If no slots are free, set the overflow flag
     if(full){
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<> lock(_mutex);
         memset(_inputReport.keys, KEY_ERR_OVF, sizeof(_inputReport.keys));
     }
 
@@ -174,7 +174,7 @@ void KeyboardDevice::keyRelease(uint8_t keyCode)
     {
         if (_inputReport.keys[slotIdx] == keyCode)
         {
-            std::lock_guard<std::mutex> lock(_mutex);
+            // std::lock_guard<std::mutex> lock(_mutex);
             _inputReport.keys[slotIdx] = 0x00;
             break;
         }
@@ -212,7 +212,7 @@ void KeyboardDevice::sendKeyReportImpl()
 
     // Copy key input report into buffer
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         memcpy(&m[currentReportIndex], &_inputReport, sizeof(_inputReport));
         input->setValue((uint8_t*)&_inputReport, sizeof(_inputReport));
     }
@@ -245,7 +245,7 @@ void KeyboardDevice::sendMediaKeyReportImpl()
 
     // Copy key input report into buffer
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         m[0] = _mediaKeyInputReport.keys & 0xFF;
         m[1] = (_mediaKeyInputReport.keys >> 8) & 0xFF;
         m[2] = (_mediaKeyInputReport.keys >> 16) & 0xFF;
@@ -254,3 +254,5 @@ void KeyboardDevice::sendMediaKeyReportImpl()
     }
     _mediaInput->notify();
 }
+
+

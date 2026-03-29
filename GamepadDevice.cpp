@@ -4,10 +4,10 @@
 #include <stdexcept>
 
 #if defined(CONFIG_ARDUHAL_ESP_LOG)
-#include "esp32-hal-log.h"
+// #include "esp32-hal-log.h"
 #define LOG_TAG "GamepadDevice"
 #else
-#include "esp_log.h"
+// #include "esp_log.h"
 static const char *LOG_TAG = "GamepadDevice";
 #endif
 
@@ -17,11 +17,11 @@ GamepadCallbacks::GamepadCallbacks(GamepadDevice* device) : _device(device)
 
 void GamepadCallbacks::onWrite(NimBLECharacteristic* pCharacteristic, NimBLEConnInfo& connInfo)
 {
-    ESP_LOGD(LOG_TAG, "GamepadCallbacks::onWrite, value: %s", pCharacteristic->getValue().c_str());
-    
+    // ESP_LOGD(LOG_TAG, "GamepadCallbacks::onWrite, value: %s", pCharacteristic->getValue().c_str());
+
     uint8_t playerIndicatorBitflags = pCharacteristic->getValue<uint8_t>();
     uint8_t playerIndicator = 0;
-    
+
     // Iterate over each bit position
     for (int i = 0; i < 8; ++i) {
         // Check if the bit is set (1)
@@ -40,21 +40,21 @@ void GamepadCallbacks::onWrite(NimBLECharacteristic* pCharacteristic, NimBLEConn
 
 void GamepadCallbacks::onRead(NimBLECharacteristic* pCharacteristic, NimBLEConnInfo& connInfo)
 {
-    ESP_LOGD(LOG_TAG, "GamepadCallbacks::onRead");
+    // ESP_LOGD(LOG_TAG, "GamepadCallbacks::onRead");
 }
 
 void GamepadCallbacks::onStatus(NimBLECharacteristic* pCharacteristic, int code)
 {
-    ESP_LOGD(LOG_TAG, "GamepadCallbacks::onStatus, code: %d", code);
+    // ESP_LOGD(LOG_TAG, "GamepadCallbacks::onStatus, code: %d", code);
 }
 
 void GamepadCallbacks::onSubscribe(NimBLECharacteristic* pCharacteristic, NimBLEConnInfo& connInfo, uint16_t subValue)
 {
-    ESP_LOGD(LOG_TAG, "GamepadCallbacks::onSubscribe");
+    // ESP_LOGD(LOG_TAG, "GamepadCallbacks::onSubscribe");
 }
 
-GamepadDevice::GamepadDevice() : 
-    _config(GamepadConfiguration()), 
+GamepadDevice::GamepadDevice() :
+    _config(GamepadConfiguration()),
     _buttons(),
     _specialButtons(),
     _x(0),
@@ -95,7 +95,7 @@ GamepadDevice::GamepadDevice() :
 }
 
 GamepadDevice::GamepadDevice(const GamepadConfiguration& config):
-    _config(config), 
+    _config(config),
     _buttons(),
     _specialButtons(),
     _x(0),
@@ -165,7 +165,7 @@ const BaseCompositeDeviceConfiguration* GamepadDevice::getDeviceConfig() const
 
 void GamepadDevice::resetButtons()
 {
-    std::lock_guard<std::mutex> lock(_mutex);
+    // std::lock_guard<std::mutex> lock(_mutex);
     memset(&_buttons, 0, sizeof(_buttons));
 }
 
@@ -205,7 +205,7 @@ void GamepadDevice::setAxes(int16_t x, int16_t y, int16_t z, int16_t rZ, int16_t
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _x = x;
         _y = y;
         _z = z;
@@ -246,7 +246,7 @@ void GamepadDevice::setSimulationControls(int16_t rudder, int16_t throttle, int1
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _rudder = rudder;
         _throttle = throttle;
         _accelerator = accelerator;
@@ -263,7 +263,7 @@ void GamepadDevice::setSimulationControls(int16_t rudder, int16_t throttle, int1
 void GamepadDevice::setHats(signed char hat1, signed char hat2, signed char hat3, signed char hat4)
 {
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _hat1 = hat1;
         _hat2 = hat2;
         _hat3 = hat3;
@@ -288,7 +288,7 @@ void GamepadDevice::setSliders(int16_t slider1, int16_t slider2)
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _slider1 = slider1;
         _slider2 = slider2;
     }
@@ -309,7 +309,7 @@ void GamepadDevice::press(uint8_t b)
 
     if (result != _buttons[index])
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _buttons[index] = result;
     }
 
@@ -329,7 +329,7 @@ void GamepadDevice::release(uint8_t b)
 
     if (result != _buttons[index])
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _buttons[index] = result;
     }
 
@@ -341,8 +341,7 @@ void GamepadDevice::release(uint8_t b)
 
 uint8_t GamepadDevice::specialButtonBitPosition(uint8_t b)
 {
-    if (b >= POSSIBLESPECIALBUTTONS)
-        throw std::invalid_argument("Index out of range");
+    // b >= POSSIBLESPECIALBUTTONS -> throw exception
     uint8_t bit = 0;
     for (int i = 0; i < b; i++)
     {
@@ -362,7 +361,7 @@ void GamepadDevice::pressSpecialButton(uint8_t b)
 
     if (result != _specialButtons)
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _specialButtons = result;
     }
 
@@ -382,7 +381,7 @@ void GamepadDevice::releaseSpecialButton(uint8_t b)
 
     if (result != _specialButtons)
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _specialButtons = result;
     }
 
@@ -484,7 +483,7 @@ void GamepadDevice::setLeftThumb(int16_t x, int16_t y)
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _x = x;
         _y = y;
     }
@@ -507,7 +506,7 @@ void GamepadDevice::setRightThumb(int16_t z, int16_t rZ)
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _z = z;
         _rZ = rZ;
     }
@@ -526,7 +525,7 @@ void GamepadDevice::setLeftTrigger(int16_t rX)
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _rX = rX;
     }
 
@@ -544,7 +543,7 @@ void GamepadDevice::setRightTrigger(int16_t rY)
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _rY = rY;
     }
 
@@ -566,7 +565,7 @@ void GamepadDevice::setTriggers(int16_t rX, int16_t rY)
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _rX = rX;
         _rY = rY;
     }
@@ -580,7 +579,7 @@ void GamepadDevice::setTriggers(int16_t rX, int16_t rY)
 void GamepadDevice::setHat(signed char hat)
 {
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _hat1 = hat;
     }
 
@@ -593,7 +592,7 @@ void GamepadDevice::setHat(signed char hat)
 void GamepadDevice::setHat1(signed char hat1)
 {
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _hat1 = hat1;
     }
 
@@ -606,7 +605,7 @@ void GamepadDevice::setHat1(signed char hat1)
 void GamepadDevice::setHat2(signed char hat2)
 {
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _hat2 = hat2;
     }
 
@@ -619,7 +618,7 @@ void GamepadDevice::setHat2(signed char hat2)
 void GamepadDevice::setHat3(signed char hat3)
 {
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _hat3 = hat3;
     }
 
@@ -632,7 +631,7 @@ void GamepadDevice::setHat3(signed char hat3)
 void GamepadDevice::setHat4(signed char hat4)
 {
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _hat4 = hat4;
     }
 
@@ -651,7 +650,7 @@ void GamepadDevice::setX(int16_t x)
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _x = x;
     }
 
@@ -669,7 +668,7 @@ void GamepadDevice::setY(int16_t y)
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _y = y;
     }
 
@@ -687,7 +686,7 @@ void GamepadDevice::setZ(int16_t z)
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _z = z;
     }
 
@@ -705,7 +704,7 @@ void GamepadDevice::setRZ(int16_t rZ)
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _rZ = rZ;
     }
 
@@ -723,7 +722,7 @@ void GamepadDevice::setRX(int16_t rX)
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _rX = rX;
     }
 
@@ -741,7 +740,7 @@ void GamepadDevice::setRY(int16_t rY)
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _rY = rY;
     }
 
@@ -759,7 +758,7 @@ void GamepadDevice::setSlider(int16_t slider)
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _slider1 = slider;
     }
 
@@ -777,7 +776,7 @@ void GamepadDevice::setSlider1(int16_t slider1)
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _slider1 = slider1;
     }
 
@@ -795,7 +794,7 @@ void GamepadDevice::setSlider2(int16_t slider2)
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _slider2 = slider2;
     }
 
@@ -813,7 +812,7 @@ void GamepadDevice::setRudder(int16_t rudder)
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _rudder = rudder;
     }
 
@@ -831,7 +830,7 @@ void GamepadDevice::setThrottle(int16_t throttle)
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _throttle = throttle;
     }
 
@@ -849,7 +848,7 @@ void GamepadDevice::setAccelerator(int16_t accelerator)
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _accelerator = accelerator;
     }
 
@@ -867,7 +866,7 @@ void GamepadDevice::setBrake(int16_t brake)
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _brake = brake;
     }
 
@@ -885,7 +884,7 @@ void GamepadDevice::setSteering(int16_t steering)
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _steering = steering;
     }
 
@@ -931,11 +930,11 @@ void GamepadDevice::sendGamepadReportImp()
 
     {
         // Lock the device input data
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
 
         memset(&m, 0, sizeof(m));
         memcpy(&m, &_buttons, sizeof(_buttons));
-        
+
         currentReportIndex += _config.getButtonNumBytes();
 
         if (_config.getTotalSpecialButtonCount() > 0)

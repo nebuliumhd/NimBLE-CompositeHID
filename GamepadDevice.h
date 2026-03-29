@@ -111,7 +111,7 @@ public:
     void setBrake(int16_t brake = 0);
     void setSteering(int16_t steering = 0);
     void setSimulationControls(int16_t rudder = 0, int16_t throttle = 0, int16_t accelerator = 0, int16_t brake = 0, int16_t steering = 0);
-    
+
     bool isPressed(uint8_t b = BUTTON_1); // check BUTTON_1 by default
     bool isConnected(void);
     void resetButtons();
@@ -138,7 +138,7 @@ private:
     uint8_t playerIndicator;
 
     // Threaded access
-    std::mutex _mutex;
+    // std::mutex _mutex;
 
     // NimBLECharacteristic* _setEffectCharacteristic;
     // NimBLECharacteristic* _setEnvelopeCharacteristic;

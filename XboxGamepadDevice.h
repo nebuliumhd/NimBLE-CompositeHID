@@ -15,7 +15,7 @@
 #define XBOX_BUTTON_A 0x01
 #define XBOX_BUTTON_B 0x02
 // UNUSED - 0x04
-#define XBOX_BUTTON_X 0x08 
+#define XBOX_BUTTON_X 0x08
 #define XBOX_BUTTON_Y 0x10
 // UNUSED - 0x20
 #define XBOX_BUTTON_LB 0x40
@@ -85,14 +85,14 @@ private:
 struct XboxGamepadOutputReportData {
     uint8_t dcEnableActuators = 0x00;   // 4bits for DC Enable Actuators, 4bits padding
     uint8_t leftTriggerMagnitude = 0;
-    uint8_t rightTriggerMagnitude = 0; 
+    uint8_t rightTriggerMagnitude = 0;
     uint8_t weakMotorMagnitude = 0;
-    uint8_t strongMotorMagnitude = 0; 
+    uint8_t strongMotorMagnitude = 0;
     uint8_t duration = 0;               // UNUSED
     uint8_t startDelay = 0;             // UNUSED
     uint8_t loopCount = 0;              // UNUSED
 
-    constexpr XboxGamepadOutputReportData(uint64_t value = 0) noexcept : 
+    constexpr XboxGamepadOutputReportData(uint64_t value = 0) noexcept :
         dcEnableActuators((value & 0xFF)),
         leftTriggerMagnitude((value >> 8) & 0xFF),
         rightTriggerMagnitude((value >> 16) & 0xFF),
@@ -106,13 +106,13 @@ struct XboxGamepadOutputReportData {
 
 #pragma pack(push, 1)
 struct XboxGamepadInputReportData {
-    uint16_t x = 0;             // Left joystick X
-    uint16_t y = 0;             // Left joystick Y
-    uint16_t z = 0;             // Right jostick X
-    uint16_t rz = 0;            // Right joystick Y
+    uint16_t x = XBOX_AXIS_CENTER_OFFSET;             // Left joystick X
+    uint16_t y = XBOX_AXIS_CENTER_OFFSET;             // Left joystick Y
+    uint16_t z = XBOX_AXIS_CENTER_OFFSET;             // Right jostick X
+    uint16_t rz = XBOX_AXIS_CENTER_OFFSET;            // Right joystick Y
     uint16_t brake = 0;         // 10 bits for brake (left trigger) + 6 bit padding (2 bytes)
     uint16_t accelerator = 0;   // 10 bits for accelerator (right trigger) + 6bit padding
-    uint8_t hat = 0x00;         // 4bits for hat switch (Dpad) + 4 bit padding (1 byte) 
+    uint8_t hat = 0x00;         // 4bits for hat switch (Dpad) + 4 bit padding (1 byte)
     uint16_t buttons = 0x00;    // 15 * 1bit for buttons + 1 bit padding (2 bytes)
     uint8_t share = 0x00;      // 1 bits for share/menu button + 7 bit padding (1 byte)
 };
@@ -136,7 +136,7 @@ static uint8_t dPadDirectionToValue(XboxDpadFlags direction){
         return XBOX_BUTTON_DPAD_WEST;
     else if(direction == (XboxDpadFlags::WEST | XboxDpadFlags::NORTH))
         return XBOX_BUTTON_DPAD_NORTHWEST;
-    
+
     return XBOX_BUTTON_DPAD_NONE;
 }
 
@@ -174,8 +174,8 @@ public:
 
     // Input Controls
     void resetInputs();
-    void press(uint16_t button = XBOX_BUTTON_A);    
-    void release(uint16_t button = XBOX_BUTTON_A); 
+    void press(uint16_t button = XBOX_BUTTON_A);
+    void release(uint16_t button = XBOX_BUTTON_A);
     bool isPressed(uint16_t button = XBOX_BUTTON_A);
     void setLeftThumb(int16_t x = 0, int16_t y = 0);
     void setRightThumb(int16_t z = 0, int16_t rZ = 0);
@@ -189,7 +189,7 @@ public:
     bool isDPadPressedFlag(XboxDpadFlags direction);
     void pressShare();
     void releaseShare();
-    
+
     void sendGamepadReport(bool defer = false);
 
 private:
@@ -202,7 +202,7 @@ private:
     XboxGamepadDeviceConfiguration* _config;
 
     // Threading
-    std::mutex _mutex;
+    // std::mutex _mutex;
 };
 
 #endif // XBOX_GAMEPAD_DEVICE_H

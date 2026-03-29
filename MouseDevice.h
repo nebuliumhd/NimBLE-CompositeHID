@@ -22,7 +22,7 @@ private:
 public:
     MouseDevice();
     MouseDevice(const MouseConfiguration& config);
-    
+
     void init(NimBLEHIDDevice* hid) override;
     const BaseCompositeDeviceConfiguration* getDeviceConfig() const override;
 
@@ -31,14 +31,14 @@ public:
     void mousePress(uint8_t button = MOUSE_LOGICAL_LEFT_BUTTON);
     void mouseRelease(uint8_t button = MOUSE_LOGICAL_LEFT_BUTTON);
     void mouseMove(signed char x, signed char y, signed char scrollX = 0, signed char scrollY = 0);
-    
+
     void sendMouseReport(bool defer = false);
 
 private:
     void sendMouseReportImpl();
 
     // Threading
-    std::mutex _mutex;
+    // ::mutex _mutex;
 };
 
 #endif

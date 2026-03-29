@@ -25,7 +25,7 @@ struct KeyboardOutputReport {
     bool composeActive;
     bool kanaActive;
 
-    constexpr KeyboardOutputReport(uint8_t value = 0) noexcept : 
+    constexpr KeyboardOutputReport(uint8_t value = 0) noexcept :
         numLockActive(value & KEY_LED_NUMLOCK),
         capsLockActive(value & KEY_LED_CAPSLOCK),
         scrollLockActive(value & KEY_LED_SCROLLLOCK),
@@ -34,7 +34,7 @@ struct KeyboardOutputReport {
     {}
 };
 
-// Forwards 
+// Forwards
 class KeyboardDevice;
 
 class KeyboardCallbacks : public NimBLECharacteristicCallbacks {
@@ -66,7 +66,7 @@ public:
     KeyboardDevice();
     KeyboardDevice(const KeyboardConfiguration& config);
     ~KeyboardDevice();
-    
+
     void init(NimBLEHIDDevice* hid) override;
     const BaseCompositeDeviceConfiguration* getDeviceConfig() const override;
 
@@ -89,7 +89,7 @@ private:
     void sendMediaKeyReportImpl();
 
     // Threading
-    std::mutex _mutex;
+    // std::mutex _mutex;
 };
 
 #endif

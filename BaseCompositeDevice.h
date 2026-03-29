@@ -1,6 +1,7 @@
 #ifndef COMPOSITE_CONFIG_H
 #define COMPOSITE_CONFIG_H
 
+#include <functional>
 #include <Arduino.h>
 //#include <HIDKeyboardTypes.h>
 #include <NimBLECharacteristic.h>
@@ -10,7 +11,7 @@
 // Forwards
 class BleCompositeHID;
 
-class BaseCompositeDeviceConfiguration 
+class BaseCompositeDeviceConfiguration
 {
 public:
     BaseCompositeDeviceConfiguration(uint8_t reportId);
@@ -20,7 +21,7 @@ public:
 
     uint8_t getReportId() const;
     void setHidReportId(uint8_t value);
-    
+
     void setAutoDefer(bool value);
     bool getAutoDefer() const;
 
@@ -36,13 +37,13 @@ private:
 };
 
 
-class BaseCompositeDevice 
+class BaseCompositeDevice
 {
     friend class BleCompositeHID;
 public:
     virtual void init(NimBLEHIDDevice* hid) = 0;
     virtual const BaseCompositeDeviceConfiguration* getDeviceConfig() const = 0;
-    
+
     BleCompositeHID* getParent();
 
 protected:

@@ -35,7 +35,7 @@ const BaseCompositeDeviceConfiguration* MouseDevice::getDeviceConfig() const
 
 void MouseDevice::resetButtons()
 {
-    std::lock_guard<std::mutex> lock(_mutex);
+    // std::lock_guard<std::mutex> lock(_mutex);
     memset(&_mouseButtons, 0, sizeof(_mouseButtons));
 }
 
@@ -56,7 +56,7 @@ void MouseDevice::mousePress(uint8_t button)
 
     if (result != _mouseButtons[index])
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _mouseButtons[index] = result;
     }
 
@@ -76,7 +76,7 @@ void MouseDevice::mouseRelease(uint8_t button)
 
     if (result != _mouseButtons[index])
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _mouseButtons[index] = result;
     }
 
@@ -106,7 +106,7 @@ void MouseDevice::mouseMove(signed char x, signed char y, signed char scrollX, s
     }
 
     {
-        std::lock_guard<std::mutex> lock(_mutex);
+        // std::lock_guard<std::mutex> lock(_mutex);
         _mouseX = x;
         _mouseY = y;
         _mouseWheel = scrollY;
@@ -123,7 +123,7 @@ void MouseDevice::sendMouseReport(bool defer)
 {
     if (defer || _config.getAutoDefer())
     {
-        queueDeferredReport(std::bind(&MouseDevice::sendMouseReportImpl, this));
+        // queueDeferredReport(std::bind(&MouseDevice::sendMouseReportImpl, this));
     }
     else
     {
@@ -138,16 +138,16 @@ void MouseDevice::sendMouseReportImpl()
 
     if (!input || !parentDevice)
         return;
-    
+
     if(!parentDevice->isConnected())
         return;
 
     uint8_t mouse_report[_config.getDeviceReportSize()];
     uint8_t currentReportIndex = 0;
 
-    { 
-        std::lock_guard<std::mutex> lock(_mutex);
-        
+    {
+        // std::lock_guard<std::mutex> lock(_mutex);
+
         memset(&mouse_report, 0, sizeof(mouse_report));
         memcpy(&mouse_report, &_mouseButtons, sizeof(_mouseButtons));
         currentReportIndex += _config.getMouseButtonNumBytes();

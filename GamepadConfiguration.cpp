@@ -2,14 +2,14 @@
 #include "HIDTypes.h"
 
 #if defined(CONFIG_ARDUHAL_ESP_LOG)
-#include "esp32-hal-log.h"
+// #include "esp32-hal-log.h"
 #define LOG_TAG "GamepadConfiguration"
 #else
-#include "esp_log.h"
+// #include "esp_log.h"
 static const char *LOG_TAG = "GamepadConfiguration";
 #endif
 
-GamepadConfiguration::GamepadConfiguration() : 
+GamepadConfiguration::GamepadConfiguration() :
     BaseCompositeDeviceConfiguration(GAMEPAD_REPORT_ID),
     _controllerType(CONTROLLER_TYPE_GAMEPAD),
     _buttonCount(16),
@@ -26,7 +26,7 @@ GamepadConfiguration::GamepadConfiguration() :
 {
 }
 
-const char* GamepadConfiguration::getDeviceName() const 
+const char* GamepadConfiguration::getDeviceName() const
 {
     return GAMEPAD_DEVICE_NAME;
 }
@@ -246,7 +246,7 @@ size_t GamepadConfiguration::makeDeviceReport(uint8_t* buffer, size_t bufferSize
 
             // USAGE (Pointer)
             tempHidReportDescriptor[reportSize++] = USAGE(1); //0x09;
-            tempHidReportDescriptor[reportSize++] = 0x01; 
+            tempHidReportDescriptor[reportSize++] = 0x01;
 
             // LOGICAL_MINIMUM (-32767)
             tempHidReportDescriptor[reportSize++] = LOGICAL_MINIMUM(2); //0x16;
@@ -479,7 +479,7 @@ size_t GamepadConfiguration::makeDeviceReport(uint8_t* buffer, size_t bufferSize
         }
 
         if(this->getIncludeRumble()){
-            ESP_LOGI(LOG_TAG, "Start offset: %d, Bytes to copy: %d, Final size: %d", reportSize, sizeof(pidReportDescriptor), reportSize + sizeof(pidReportDescriptor));
+            // ESP_LOGI(LOG_TAG, "Start offset: %d, Bytes to copy: %d, Final size: %d", reportSize, sizeof(pidReportDescriptor), reportSize + sizeof(pidReportDescriptor));
             memcpy(&tempHidReportDescriptor[reportSize], &pidReportDescriptor[0], sizeof(pidReportDescriptor));
             reportSize += sizeof(pidReportDescriptor) / sizeof(pidReportDescriptor[0]);
         }
@@ -518,10 +518,10 @@ size_t GamepadConfiguration::makeDeviceReport(uint8_t* buffer, size_t bufferSize
             tempHidReportDescriptor[reportSize++] = END_COLLECTION(0); // End physical collection
         }
     }
-    
+
     // End gamepad collection
     tempHidReportDescriptor[reportSize++] = END_COLLECTION(0); //0xc0;
-    
+
     if(reportSize < bufferSize){
         memcpy(buffer, tempHidReportDescriptor, reportSize);
     } else {

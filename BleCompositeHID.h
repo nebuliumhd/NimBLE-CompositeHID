@@ -1,10 +1,10 @@
 #ifndef ESP32_BLE_MULTI_HID_H
 #define ESP32_BLE_MULTI_HID_H
-#include "sdkconfig.h"
-#if defined(CONFIG_BT_ENABLED)
+// #include "sdkconfig.h"
+// #if defined(CONFIG_BT_ENABLED)
 
 #include "nimconfig.h"
-#if defined(CONFIG_BT_NIMBLE_ROLE_PERIPHERAL)
+// #if defined(CONFIG_BT_NIMBLE_ROLE_PERIPHERAL)
 
 #include "BleConnectionStatus.h"
 #include "NimBLEHIDDevice.h"
@@ -14,7 +14,7 @@
 #include "BaseCompositeDevice.h"
 
 #include <vector>
-#include "SafeQueue.hpp"
+// #include "SafeQueue.hpp"
 
 class BleCompositeHID
 {
@@ -48,10 +48,10 @@ private:
     NimBLEHIDDevice* _hid;
 
     std::vector<BaseCompositeDevice*> _devices;
-    SafeQueue<std::function<void()>> _deferredReports;
+    // SafeQueue<std::function<void()>> _deferredReports;
     TaskHandle_t _autoSendTaskHandle;
 };
 
-#endif // CONFIG_BT_NIMBLE_ROLE_PERIPHERAL
-#endif // CONFIG_BT_ENABLED
+// #endif // CONFIG_BT_NIMBLE_ROLE_PERIPHERAL
+// #endif // CONFIG_BT_ENABLED
 #endif // ESP32_BLE_MULTI_HID_H
