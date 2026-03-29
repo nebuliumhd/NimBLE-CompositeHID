@@ -1,45 +1,32 @@
 #include "XboxGamepadDevice.h"
 #include "BleCompositeHID.h"
+#include "nimble_composite_platform.h"
 
-#if defined(CONFIG_ARDUHAL_ESP_LOG)
-// #include "esp32-hal-log.h"
-#define LOG_TAG "XboxGamepadDevice"
-#else
-// #include "esp_log.h"
-static const char* LOG_TAG = "XboxGamepadDevice";
-#endif
+HID_DEFINE_TAG("XboxGamepadDevice");
 
 XboxGamepadCallbacks::XboxGamepadCallbacks(XboxGamepadDevice* device)
     : _device(device) {
 }
 
 void XboxGamepadCallbacks::onWrite(NimBLECharacteristic* pCharacteristic, NimBLEConnInfo& connInfo) {
-    // An example packet we might receive from XInput might look like 0x0300002500ff00ff
   XboxGamepadOutputReportData vibrationData = pCharacteristic->getValue<uint64_t>();
-
-    // ESP_LOGD(LOG_TAG, "XboxGamepadCallbacks::onWrite, Size: %d, DC enable: %d, magnitudeWeak: %d, magnitudeStrong: %d, duration: %d, start delay: %d, loop count: %d",
-    //     pCharacteristic->getValue().size(),
-    //     vibrationData.dcEnableActuators,
-    //     vibrationData.weakMotorMagnitude,
-    //     vibrationData.strongMotorMagnitude,
-    //     vibrationData.duration,
-    //     vibrationData.startDelay,
-    //     vibrationData.loopCount
-    // );
-
+  HID_LOG_D(LOG_TAG, "onWrite – DC:%d weak:%d strong:%d dur:%d delay:%d loops:%d",
+            vibrationData.dcEnableActuators,
+            vibrationData.weakMotorMagnitude, vibrationData.strongMotorMagnitude,
+            vibrationData.duration, vibrationData.startDelay, vibrationData.loopCount);
   _device->onVibrate.fire(vibrationData);
 }
 
 void XboxGamepadCallbacks::onRead(NimBLECharacteristic* pCharacteristic, NimBLEConnInfo& connInfo) {
-    // ESP_LOGD(LOG_TAG, "XboxGamepadCallbacks::onRead");
+  HID_LOG_D(LOG_TAG, "onRead");
 }
 
 void XboxGamepadCallbacks::onSubscribe(NimBLECharacteristic* pCharacteristic, NimBLEConnInfo& connInfo, uint16_t subValue) {
-    // ESP_LOGD(LOG_TAG, "XboxGamepadCallbacks::onSubscribe");
+  HID_LOG_D(LOG_TAG, "onSubscribe subValue=%d", subValue);
 }
 
 void XboxGamepadCallbacks::onStatus(NimBLECharacteristic* pCharacteristic, int code) {
-    // ESP_LOGD(LOG_TAG, "XboxGamepadCallbacks::onStatus, code: %d", code);
+  HID_LOG_D(LOG_TAG, "onStatus code=%d", code);
 }
 
 XboxGamepadDevice::XboxGamepadDevice()
@@ -92,7 +79,7 @@ const BaseCompositeDeviceConfiguration* XboxGamepadDevice::getDeviceConfig() con
 }
 
 void XboxGamepadDevice::resetInputs() {
-    // std::lock_guard<std::mutex> lock(_mutex);
+  HID_LOCK(_mutex);
   memset(&_inputReport, 0, sizeof(XboxGamepadInputReportData));
 
   _inputReport.x = XBOX_AXIS_CENTER_OFFSET;
@@ -102,12 +89,11 @@ void XboxGamepadDevice::resetInputs() {
 }
 
 void XboxGamepadDevice::press(uint16_t button) {
-    // Avoid double presses
   if (!isPressed(button)) {
     {
-            // std::lock_guard<std::mutex> lock(_mutex);
+      HID_LOCK(_mutex);
       _inputReport.buttons |= button;
-            // ESP_LOGD(LOG_TAG, "XboxGamepadDevice::press, button: %d", button);
+      HID_LOG_D(LOG_TAG, "press button=0x%04X", button);
     }
 
     if (_config->getAutoReport()) {
@@ -117,12 +103,11 @@ void XboxGamepadDevice::press(uint16_t button) {
 }
 
 void XboxGamepadDevice::release(uint16_t button) {
-    // Avoid double presses
   if (isPressed(button)) {
     {
-            // std::lock_guard<std::mutex> lock(_mutex);
+      HID_LOCK(_mutex);
       _inputReport.buttons ^= button;
-            // ESP_LOGD(LOG_TAG, "XboxGamepadDevice::release, button: %d", button);
+      HID_LOG_D(LOG_TAG, "release button=0x%04X", button);
     }
 
     if (_config->getAutoReport()) {
@@ -132,7 +117,7 @@ void XboxGamepadDevice::release(uint16_t button) {
 }
 
 bool XboxGamepadDevice::isPressed(uint16_t button) {
-    // std::lock_guard<std::mutex> lock(_mutex);
+  HID_LOCK(_mutex);
   return (bool)((_inputReport.buttons & button) == button);
 }
 
@@ -143,7 +128,7 @@ void XboxGamepadDevice::setLeftThumb(int16_t x, int16_t y) {
 
   if (_inputReport.x != x || _inputReport.y != y) {
     {
-      // std::lock_guard<std::mutex> lock(_mutex);
+      HID_LOCK(_mutex);
       _inputReport.x = (uint16_t)x;
       _inputReport.y = (uint16_t)y;
     }
@@ -160,7 +145,7 @@ void XboxGamepadDevice::setRightThumb(int16_t z, int16_t rZ) {
 
   if (_inputReport.z != z || _inputReport.rz != rZ) {
     {
-      // std::lock_guard<std::mutex> lock(_mutex);
+      HID_LOCK(_mutex);
       _inputReport.z = (uint16_t)z;
       _inputReport.rz = (uint16_t)rZ;
     }
@@ -176,7 +161,7 @@ void XboxGamepadDevice::setLeftTrigger(uint16_t value) {
 
   if (_inputReport.brake != value) {
     {
-            // std::lock_guard<std::mutex> lock(_mutex);
+      HID_LOCK(_mutex);
       _inputReport.brake = value;
     }
 
@@ -191,7 +176,7 @@ void XboxGamepadDevice::setRightTrigger(uint16_t value) {
 
   if (_inputReport.accelerator != value) {
     {
-            // std::lock_guard<std::mutex> lock(_mutex);
+      HID_LOCK(_mutex);
       _inputReport.accelerator = value;
     }
 
@@ -207,7 +192,7 @@ void XboxGamepadDevice::setTriggers(uint16_t left, uint16_t right) {
 
   if (_inputReport.brake != left || _inputReport.accelerator != right) {
     {
-            // std::lock_guard<std::mutex> lock(_mutex);
+      HID_LOCK(_mutex);
       _inputReport.brake = left;
       _inputReport.accelerator = right;
     }
@@ -218,11 +203,10 @@ void XboxGamepadDevice::setTriggers(uint16_t left, uint16_t right) {
 }
 
 void XboxGamepadDevice::pressDPadDirection(uint8_t direction) {
-    // Avoid double presses
   if (!isDPadPressed(direction)) {
-        // ESP_LOGD(LOG_TAG, "Pressing dpad direction %s", dPadDirectionName(direction).c_str());
+    HID_LOG_D(LOG_TAG, "pressDPad direction=%s", dPadDirectionName(direction).c_str());
     {
-            // std::lock_guard<std::mutex> lock(_mutex);
+      HID_LOCK(_mutex);
       _inputReport.hat = direction;
     }
 
@@ -233,13 +217,12 @@ void XboxGamepadDevice::pressDPadDirection(uint8_t direction) {
 }
 
 void XboxGamepadDevice::pressDPadDirectionFlag(XboxDpadFlags direction) {
-    // Filter opposite button presses
   if ((direction & (XboxDpadFlags::NORTH | XboxDpadFlags::SOUTH)) == (XboxDpadFlags::NORTH | XboxDpadFlags::SOUTH)) {
-        // ESP_LOGD(LOG_TAG, "Filtering opposite button presses - up down");
+    HID_LOG_D(LOG_TAG, "Filtering opposite dpad N+S");
     direction = (XboxDpadFlags)(direction ^ (uint8_t)(XboxDpadFlags::NORTH | XboxDpadFlags::SOUTH));
   }
   if ((direction & (XboxDpadFlags::EAST | XboxDpadFlags::WEST)) == (XboxDpadFlags::EAST | XboxDpadFlags::WEST)) {
-        // ESP_LOGD(LOG_TAG, "Filtering opposite button presses - left right");
+    HID_LOG_D(LOG_TAG, "Filtering opposite dpad E+W");
     direction = (XboxDpadFlags)(direction ^ (uint8_t)(XboxDpadFlags::EAST | XboxDpadFlags::WEST));
   }
 
@@ -251,16 +234,12 @@ void XboxGamepadDevice::releaseDPad() {
 }
 
 bool XboxGamepadDevice::isDPadPressed(uint8_t direction) {
-    // std::lock_guard<std::mutex> lock(_mutex);
-    // Serial.print("Internal hat value:");
-    // Serial.println(_inputReport.hat, HEX);
+  HID_LOCK(_mutex);
   return _inputReport.hat == direction;
-    //return (bool)((_inputReport.hat & direction) == direction);
 }
 
 bool XboxGamepadDevice::isDPadPressedFlag(XboxDpadFlags direction) {
-    // std::lock_guard<std::mutex> lock(_mutex);
-
+  HID_LOCK(_mutex);
   if (direction == XboxDpadFlags::NORTH) {
     return _inputReport.hat == XBOX_BUTTON_DPAD_NORTH;
   } else if (direction == (XboxDpadFlags::NORTH & XboxDpadFlags::EAST)) {
@@ -282,10 +261,9 @@ bool XboxGamepadDevice::isDPadPressedFlag(XboxDpadFlags direction) {
 }
 
 void XboxGamepadDevice::pressShare() {
-    // Avoid double presses
   if (!(_inputReport.share & XBOX_BUTTON_SHARE)) {
     {
-            // std::lock_guard<std::mutex> lock(_mutex);
+      HID_LOCK(_mutex);
       _inputReport.share |= XBOX_BUTTON_SHARE;
     }
 
@@ -298,7 +276,7 @@ void XboxGamepadDevice::pressShare() {
 void XboxGamepadDevice::releaseShare() {
   if (_inputReport.share & XBOX_BUTTON_SHARE) {
     {
-            // std::lock_guard<std::mutex> lock(_mutex);
+      HID_LOCK(_mutex);
       _inputReport.share ^= XBOX_BUTTON_SHARE;
     }
 
@@ -327,10 +305,9 @@ void XboxGamepadDevice::sendGamepadReportImpl() {
     return;
 
   {
-        // std::lock_guard<std::mutex> lock(_mutex);
+    HID_LOCK(_mutex);
     size_t packedSize = sizeof(_inputReport);
-        // ESP_LOGD(LOG_TAG, "Sending gamepad report, size: %d", packedSize);
-        // Serial.printf("X Sent: %d, Y Sent: %d\n", _inputReport.x, _inputReport.y);
+    HID_LOG_D(LOG_TAG, "sendReport size=%d", packedSize);
     input->setValue((uint8_t*)&_inputReport, packedSize);
   }
   input->notify();

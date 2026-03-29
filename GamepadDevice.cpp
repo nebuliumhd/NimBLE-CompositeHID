@@ -1,15 +1,10 @@
 #include "GamepadDevice.h"
 #include "BleCompositeHID.h"
+#include "nimble_composite_platform.h"
 
 #include <stdexcept>
 
-#if defined(CONFIG_ARDUHAL_ESP_LOG)
-// #include "esp32-hal-log.h"
-#define LOG_TAG "GamepadDevice"
-#else
-// #include "esp_log.h"
-static const char *LOG_TAG = "GamepadDevice";
-#endif
+HID_DEFINE_TAG("GamepadDevice");
 
 GamepadCallbacks::GamepadCallbacks(GamepadDevice* device) : _device(device)
 {
@@ -17,7 +12,7 @@ GamepadCallbacks::GamepadCallbacks(GamepadDevice* device) : _device(device)
 
 void GamepadCallbacks::onWrite(NimBLECharacteristic* pCharacteristic, NimBLEConnInfo& connInfo)
 {
-    // ESP_LOGD(LOG_TAG, "GamepadCallbacks::onWrite, value: %s", pCharacteristic->getValue().c_str());
+    HID_LOG_D(LOG_TAG, "onWrite");
 
     uint8_t playerIndicatorBitflags = pCharacteristic->getValue<uint8_t>();
     uint8_t playerIndicator = 0;
@@ -40,17 +35,17 @@ void GamepadCallbacks::onWrite(NimBLECharacteristic* pCharacteristic, NimBLEConn
 
 void GamepadCallbacks::onRead(NimBLECharacteristic* pCharacteristic, NimBLEConnInfo& connInfo)
 {
-    // ESP_LOGD(LOG_TAG, "GamepadCallbacks::onRead");
+    HID_LOG_D(LOG_TAG, "onRead");
 }
 
 void GamepadCallbacks::onStatus(NimBLECharacteristic* pCharacteristic, int code)
 {
-    // ESP_LOGD(LOG_TAG, "GamepadCallbacks::onStatus, code: %d", code);
+    HID_LOG_D(LOG_TAG, "onStatus code=%d", code);
 }
 
 void GamepadCallbacks::onSubscribe(NimBLECharacteristic* pCharacteristic, NimBLEConnInfo& connInfo, uint16_t subValue)
 {
-    // ESP_LOGD(LOG_TAG, "GamepadCallbacks::onSubscribe");
+    HID_LOG_D(LOG_TAG, "onSubscribe subValue=%d", subValue);
 }
 
 GamepadDevice::GamepadDevice() :

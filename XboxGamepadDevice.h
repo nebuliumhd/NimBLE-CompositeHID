@@ -3,7 +3,7 @@
 
 #include <NimBLECharacteristic.h>
 #include <Callback.h>
-#include <mutex>
+#include "nimble_composite_platform.h"
 
 #include "BLEHostConfiguration.h"
 #include "BaseCompositeDevice.h"
@@ -201,8 +201,7 @@ private:
     XboxGamepadCallbacks* _callbacks;
     XboxGamepadDeviceConfiguration* _config;
 
-    // Threading
-    // std::mutex _mutex;
+    HID_MUTEX_TYPE _mutex; // std::mutex on ESP32; zero-size no-op on other platforms
 };
 
 #endif // XBOX_GAMEPAD_DEVICE_H

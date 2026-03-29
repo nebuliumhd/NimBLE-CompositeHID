@@ -1,14 +1,9 @@
 #include "KeyboardDevice.h"
 #include "KeyboardDescriptors.h"
 #include "BleCompositeHID.h"
+#include "nimble_composite_platform.h"
 
-#if defined(CONFIG_ARDUHAL_ESP_LOG)
-// #include "esp32-hal-log.h"
-#define LOG_TAG "KeyboardDevice"
-#else
-// #include "esp_log.h"
-static const char *LOG_TAG = "KeyboardDevice";
-#endif
+HID_DEFINE_TAG("KeyboardDevice");
 
 KeyboardCallbacks::KeyboardCallbacks(KeyboardDevice* device) :
     _device(device)
@@ -18,7 +13,7 @@ KeyboardCallbacks::KeyboardCallbacks(KeyboardDevice* device) :
 void KeyboardCallbacks::onWrite(NimBLECharacteristic* pCharacteristic, NimBLEConnInfo& connInfo)
 {
     KeyboardOutputReport ledReport = pCharacteristic->getValue<uint8_t>();
-    // ESP_LOGD(LOG_TAG, "KeyboardDevice::onWrite - LED Report: %d", ledReport);
+    HID_LOG_D(LOG_TAG, "onWrite LED report=%d", (int)ledReport);
     _device->onLED.fire(ledReport);
 }
 
